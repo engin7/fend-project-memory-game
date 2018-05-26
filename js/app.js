@@ -3,6 +3,52 @@
  */
 const cards = ["fa-diamond","fa-paper-plane-o","fa-anchor","fa-bolt","fa-cube","fa-anchor","fa-leaf","fa-bicycle","fa-diamond","fa-bomb","fa-leaf","fa-bomb","fa-bolt","fa-bicycle","fa-paper-plane-o","fa-cube"]; 
 
+// All other variables,const,let etc.
+const deck = document.querySelector(".deck");
+const moves = document.querySelector(".moves");
+const playAgain = document.querySelector(".playAgain");
+const restart = document.querySelector(".restart");
+const stars = document.querySelector(".stars");
+const star = `<li><i class="fa fa-star"></i></li>`;
+const modal = document.querySelector(".modal");
+const modalText = document.querySelector(".modalText");
+let openedCards = [];  let matches = [];
+let numberOfMoves = moves.textContent;
+let numberOfStars = 3;
+let timer = document.querySelector(".timer");
+let seconds = 0; 
+
+//Restart func
+function restart() {
+    for(let i = 0; i < cards.length; i++) {
+        const card = document.createElement("li");
+        card.classList.add("card");
+        card.innerHTML = `<i class="${cards[i]}"></i>`;
+        deck.appendChild(card);
+        play(card);
+    }
+  
+    matches = [];
+    moves.innerHTML = 0;
+
+    // Reset rating&timer
+     for (var i = 0; i < 3; i++) {
+    stars.innerHTML += star;
+}
+    stopTimer();
+    isFirstClick = true;
+    timer.innerHTML = seconds + "s";
+}
+
+//Restart button
+restart.addEventListener("click", function() {
+    // Delete ALL cards
+    deck.innerHTML = "";
+    // Reset and start the game 
+    restart();
+});
+
+
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below

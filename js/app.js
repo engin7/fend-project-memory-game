@@ -25,6 +25,7 @@ function restart() {
         card.classList.add("card");
         card.innerHTML = `<i class="${cards[i]}"></i>`;
         deck.appendChild(card);
+        //playing event
         play(card);
     }
   
@@ -47,6 +48,9 @@ restart.addEventListener("click", function() {
     // Reset and start the game 
     restart();
 });
+
+/////// (Re)start the game 
+restart();
 
 
 /*

@@ -4,9 +4,14 @@ const myMoves = document.querySelector(".moves");
 const myStars = document.querySelector(".stars");
 const myTimer = document.querySelector(".timer");
 const restartB = document.querySelector(".restart");
+let modal = document.getElementById('modal');
+let modalText = document.querySelector('h2');
+
+
 let opened = [];
 let matches = [];
 let myRating;
+let numberOfStars = 3;
 //Initialize the game
 function init() {
         shuffle(cards);
@@ -64,14 +69,7 @@ function compare(currentCard, previousCard) {
     }
     addMove();
 }
-// Check if GameOver
-function GameOver() {
-    if(matches.length === cards.length) {
-        // Stop  timer
-        stopTimer();
-        alert('Game Over! \u00A0\u00A0' + myRating);
-    }
-}
+
 //Add move number
 let moves = 0;
 myMoves.innerHTML = 0;
@@ -90,14 +88,29 @@ function rating() {
     if( moves < 20) {
         myStars.innerHTML = star + star + star;
         myRating = 'Excellent job!';
+        numberOfStars = 3;
     } else if( moves < 30) {
         myStars.innerHTML = star + star;
         myRating = 'Not bad.';
+        numberOfStars = 2;
     } else {
         myStars.innerHTML = star;
         myRating = 'Fish memory?';
+        numberOfStars = 1;
     }
 }
+
+// Check if GameOver
+function GameOver() {
+    if(matches.length === 2) {
+        stopTimer();
+        modalText = 'Game Over! \r\n' + myRating  +   '\r\nYour stars: \u00A0' + numberOfStars +   '\r\nTime passed: \u00A0'+ totalSeconds + 'seconds' + '\r\nPlease close this window and press restart button to play again.';
+        modal.style.display = 'block';
+        // Stop  timer
+
+    }
+}
+
 //Timer...
 let time, totalSeconds = 0;
 myTimer.innerHTML = '\u00A0\u00A0\u00A0\u00A0' + 'Time:' + '\u00A0' + totalSeconds + 's';

@@ -1,65 +1,139 @@
-/*
- * Create a list that holds all of your cards
- */
-const cards = ["fa-diamond","fa-paper-plane-o","fa-anchor","fa-bolt","fa-cube","fa-anchor","fa-leaf","fa-bicycle","fa-diamond","fa-bomb","fa-leaf","fa-bomb","fa-bolt","fa-bicycle","fa-paper-plane-o","fa-cube"]; 
-
-// All other variables,const,let etc.
+const cards = ["fa-diamond", "fa-diamond", "fa-paper-plane-o", "fa-paper-plane-o", "fa-anchor", "fa-anchor", "fa-bolt", "fa-bolt", "fa-cube", "fa-cube", "fa-leaf", "fa-leaf", "fa-bicycle", "fa-bicycle", "fa-bomb", "fa-bomb"];
 const deck = document.querySelector(".deck");
-const moves = document.querySelector(".moves");
-const playAgain = document.querySelector(".playAgain");
-const restart = document.querySelector(".restart");
-const stars = document.querySelector(".stars");
-const star = `<li><i class="fa fa-star"></i></li>`;
-const modal = document.querySelector(".modal");
-const modalText = document.querySelector(".modalText");
-let openedCards = [];  let matches = [];
-let numberOfMoves = moves.textContent;
-let numberOfStars = 3;
-let timer = document.querySelector(".timer");
-let seconds = 0; 
-
-//Restart func
-function restart() {
+const myMoves = document.querySelector(".moves");
+const myStars = document.querySelector(".stars");
+const myTimer = document.querySelector(".timer");
+const restartB = document.querySelector(".restart");
+let opened = [];
+let matches = [];
+let myRating;
+//Initialize the game
+function init() {
+        shuffle(cards);
     for(let i = 0; i < cards.length; i++) {
         const card = document.createElement("li");
         card.classList.add("card");
-        card.innerHTML = `<i class="${cards[i]}"></i>`;
+        card.innerHTML = `<i class="fa ${cards[i]}"></i>`;
         deck.appendChild(card);
-        //playing event
         play(card);
     }
-  
-    matches = [];
-    moves.innerHTML = 0;
-
-    // Reset rating&timer
-     for (var i = 0; i < 3; i++) {
-    stars.innerHTML += star;
 }
-    stopTimer();
-    isFirstClick = true;
-    timer.innerHTML = seconds + "s";
+//play event
+function play(card) {
+//prevent clicking opened cards
+    card.addEventListener("click", function() {
+        // Card Click Event
+      if (!card.classList.contains('open') || !card.classList.contains('show')){
+        const currentCard = this;
+        const previousCard = opened[0];
+        // if we opened a card
+        if(opened.length === 1) {
+            card.classList.add("open", "show", "disable");
+            opened.push(this);
+            compare(currentCard, previousCard);
+        }
+        else {
+        // no opened cards (first start)
+            currentCard.classList.add("open", "show", "disable");
+            opened.push(this);
+        }
+    }});
 }
-
-//Restart button
-restart.addEventListener("click", function() {
-    // Delete ALL cards
+function compare(currentCard, previousCard) {
+    // There is a Match!
+    if(currentCard.innerHTML === previousCard.innerHTML) {
+        currentCard.classList.add("match");
+        previousCard.classList.add("match");
+        matches.push(currentCard, previousCard);
+        //clear opencards slot
+        opened = [];
+        // Check if all matched
+        GameOver();
+    } else {
+        // close cards when there is no match temporarily flash red
+        setTimeout(function() {
+           currentCard.classList.add("unmatch");
+           previousCard.classList.add("unmatch");
+        }, 300);
+        setTimeout(function() {
+            currentCard.classList.remove("open", "show", "disable","unmatch");
+            previousCard.classList.remove("open", "show", "disable","unmatch");
+        }, 1200);
+        //clear opencards slot
+        opened = [];
+    }
+    addMove();
+}
+// Check if GameOver
+function GameOver() {
+    if(matches.length === cards.length) {
+        // Stop  timer
+        stopTimer();
+        alert('Game Over! \u00A0\u00A0' + myRating);
+    }
+}
+//Add move number
+let moves = 0;
+myMoves.innerHTML = 0;
+function addMove() {
+    moves++;
+    if (moves === 1){
+           startTimer();
+         };
+    myMoves.innerHTML = moves;
+    rating();
+}
+//Rating...
+const star = `<li><i class="fa fa-star"></i></li>`;
+myStars.innerHTML = star + star + star;
+function rating() {
+    if( moves < 20) {
+        myStars.innerHTML = star + star + star;
+        myRating = 'Excellent job!';
+    } else if( moves < 30) {
+        myStars.innerHTML = star + star;
+        myRating = 'Not bad.';
+    } else {
+        myStars.innerHTML = star;
+        myRating = 'Fish memory?';
+    }
+}
+//Timer...
+let time, totalSeconds = 0;
+myTimer.innerHTML = '\u00A0\u00A0\u00A0\u00A0' + 'Time:' + '\u00A0' + totalSeconds + 's';
+ function startTimer() {
+    time = setInterval(function() {
+        // Increase the totalSeconds by 1
+        totalSeconds++;
+        // Update the HTML Container with the new time
+        myTimer.innerHTML = '\u00A0\u00A0\u00A0\u00A0' + 'Time:' + '\u00A0' + totalSeconds + 's';
+    }, 1000);
+}
+// The clearInterval() method clears a timer set with the setInterval() method.
+function stopTimer() {
+    clearInterval(time);
+}
+//Restart Button...
+restartB.addEventListener("click", function() {
+    // Delete cards in the deck
     deck.innerHTML = "";
-    // Reset and start the game 
-    restart();
+    // create and shuffle new cards
+    init();
+    // Reset the game
+    reset();
 });
-
-/////// (Re)start the game 
-restart();
-
-
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
- */
-
+function reset() {
+    matches = [];
+    moves = 0;
+    myMoves.innerHTML = moves;
+    // give back my stars
+    myStars.innerHTML = star + star + star;
+    stopTimer();
+    totalSeconds = 0;
+    myTimer.innerHTML = '\u00A0\u00A0\u00A0\u00A0' + 'Time:' + '\u00A0' + totalSeconds + 's';
+}
+// Initialize the game
+init();
 // Shuffle function from http://stackoverflow.com/a/2450976
 function shuffle(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
@@ -71,18 +145,5 @@ function shuffle(array) {
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
     }
-
     return array;
 }
-
-
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */
